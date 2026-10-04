@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МультПланета — смотри мультфильмы онлайн</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f1220;
+    color: #e8eaf6;
+    line-height: 1.6;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  .header {
+    background: #171a2e;
+    border-bottom: 1px solid #2a2f4a;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header__inner {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 15px 20px;
+    flex-wrap: wrap;
+  }
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffb74d;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .nav { display: flex; gap: 20px; flex: 1; }
+  .nav__link {
+    color: #b0b3c5;
+    text-decoration: none;
+    transition: color .2s;
+    cursor: pointer;
+  }
+  .nav__link:hover { color: #fff; }
+
+  .search input {
+    background: #0f1220;
+    border: 1px solid #2a2f4a;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    width: 260px;
+    outline: none;
+  }
+  .search input:focus { border-color: #ffb74d; }
+
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 50px 0 20px;
+  }
+  .hero h1 {
+    font-size: 40px;
+    background: linear-gradient(90deg, #ffb74d, #ff7043);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .hero p { color: #9ea1b8; font-size: 18px; }
+
+  /* Разделы */
+  .section { margin: 40px 0; }
+  .section__title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section__title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: #ffb74d;
+    border-radius: 2px;
+  }
+
+  /* Filters */
+  .filters {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .filter-btn {
+    background: #1c2039;
+    color: #b0b3c5;
+    border: 1px solid #2a2f4a;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all .2s;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .filter-btn:hover { border-color: #ffb74d; color: #fff; }
+  .filter-btn.active {
+    background: #ffb74d;
+    color: #0f1220;
+    border-color: #ffb74d;
+    font-weight: 600;
+  }
+
+  /* Каталог */
+  .catalog {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 24px;
+    padding-bottom: 40px;
+  }
+  .card {
+    background: #1c2039;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform .25s, box-shadow .25s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 10px 30px rgba(255, 183, 77, .15);
+  }
+  .card__poster {
+    width: 100%;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    background: #2a2f4a;
+    display: block;
+  }
+  .card__body { padding: 14px; }
+  .card__title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .card__meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #9ea1b8;
+  }
+  .card__rating { color: #ffb74d; font-weight: 600; }
+
+  .empty {
+    grid-column: 1/-1;
+    text-align: center;
+    padding: 60px;
+    color: #9ea1b8;
+  }
+
+  /* Footer */
+  .footer {
+    background: #171a2e;
+    padding: 30px 0;
+    text-align: center;
+    color: #6b6f88;
+    font-size: 14px;
+    border-top: 1px solid #2a2f4a;
+  }
+
+  /* Страница сериала / мультфильма */
+  .movie-page { padding: 40px 0; }
+  .movie-header {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+  }
+  .movie-poster {
+    width: 100%;
+    border-radius: 12px;
+    aspect-ratio: 2/3;
+    object-fit: cover;
+    background: #2a2f4a;
+  }
+  .movie-info h1 { font-size: 32px; margin-bottom: 14px; }
+  .movie-meta {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    color: #9ea1b8;
+    font-size: 14px;
+  }
+  .movie-meta span { display: flex; align-items: center; gap: 6px; }
+  .movie-rating { color: #ffb74d; font-size: 18px; font-weight: 700; }
+  .movie-desc { font-size: 16px; line-height: 1.7; color: #c5c8dc; }
+  .genres { display: flex; gap: 8px; flex-wrap: wrap; margin: 16px 0; }
+  .genre-tag {
+    background: #2a2f4a;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .player {
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 16/9;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .player iframe, .player video {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .player-placeholder {
+    text-align: center;
+    color: #6b6f88;
+  }
+
+  /* Список серий */
+  .episodes {
+    margin-top: 40px;
+  }
+  .episodes__title {
+    font-size: 22px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .episodes__title::before {
+    content: '';
+    width: 4px;
+    height: 22px;
+    background: #ffb74d;
+    border-radius: 2px;
+  }
+  .episodes__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .episode {
+    background: #1c2039;
+    border: 1px solid #2a2f4a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all .2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .episode:hover {
+    border-color: #ffb74d;
+    background: #232847;
+  }
+  .episode.active {
+    border-color: #ffb74d;
+    background: #2a2f4a;
+  }
+  .episode__num {
+    background: #ffb74d;
+    color: #0f1220;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .episode__title {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffb74d;
+    text-decoration: none;
+    margin-bottom: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-family: inherit;
+  }
+  .back-btn:hover { text-decoration: underline; }
+
+  @media (max-width: 768px) {
+    .header__inner { flex-wrap: wrap; }
+    .search input { width: 100%; }
+    .search { width: 100%; }
+    .hero h1 { font-size: 28px; }
+    .movie-header { grid-template-columns: 1fr; }
+    .movie-poster { max-width: 220px; margin: 0 auto; }
+    .nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="container header__inner">
+    <a class="logo" onclick="goHome()">🌍 МультПланета</a>
+    <nav class="nav">
+      <a class="nav__link" onclick="goHome()">Главная</a>
+      <a class="nav__link" onclick="goHome()">Сериалы</a>
+      <a class="nav__link" onclick="goHome()">Фильмы</a>
+    </nav>
+    <div class="search">
+      <input type="text" id="search" placeholder="Поиск мультфильма...">
+    </div>
+  </div>
+</header>
+
+<main class="container" id="app"></main>
+
+<footer class="footer">
+  <div class="container">
+    <p>© 2025 МультПланета. Все мультфильмы принадлежат их правообладателям.</p>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   ДАННЫЕ
+   ------------------------------------------------------------
+   type: "series" — сериал с сериями
+   type: "movie"  — одиночный мультфильм
+   ------------------------------------------------------------
+   ВАЖНО: чтобы добавить СВОЁ видео — положи файл в папку video/
+   и укажи путь "video/имя-файла.mp4"
+   ============================================================ */
+const cartoons = [
+
+  /* ---------- СЕРИАЛЫ ---------- */
+  {
+    id: 1,
+    type: "series",
+    title: "Барбоскины",
+    year: 2011,
+    rating: 7.0,
+    genres: ["комедия", "семейный"],
+    country: "Россия",
+    description: "Весёлая собачья семья Барбоскиных: папа, мама и пятеро щенят — Роза, Дружок, Малыш, Лиза и Гена. Каждая серия — забавная история о дружбе, семье и приключениях.",
+    poster: "https://upload.wikimedia.org/wikipedia/ru/9/9c/%D0%91%D0%B0%D1%80%D0%B1%D0%BE%D1%81%D0%BA%D0%B8%D0%BD%D1%8B.jpg",
+    episodes: [
+      { title: "Серия 1. Знакомство",     video: "video/barboskiny-1.mp4" },
+      { title: "Серия 2. Лучший друг",    video: "video/barboskiny-2.mp4" },
+      { title: "Серия 3. Большая уборка", video: "video/barboskiny-3.mp4" },
+      { title: "Серия 4. День рождения",  video: "video/barboskiny-4.mp4" }
+    ]
+  },
+  {
+    id: 2,
+    type: "series",
+    title: "Лунтик и его друзья",
+    year: 2006,
+    rating: 6.8,
+    genres: ["семейный", "приключения"],
+    country: "Россия",
+    description: "Лунтик — маленькое существо, родившееся на Луне и упавшее на Землю. Он познаёт мир вместе с друзьями: кузнечиком Кузей, бабочкой Милой, пчёлкой Бабой Капой и другими.",
+    poster: "https://upload.wikimedia.org/wikipedia/ru/8/8f/%D0%9B%D1%83%D0%BD%D1%82%D0%B8%D0%BA.jpg",
+    episodes: [
+      { title: "Серия 1. Как родился Лунтик", video: "video/luntik-1.mp4" },
+      { title: "Серия 2. Знакомство с Кузей", video: "video/luntik-2.mp4" },
+      { title: "Серия 3. Первый дождь",       video: "video/luntik-3.mp4" }
+    ]
+  },
+  {
+    id: 3,
+    type: "series",
+    title: "Маша и Медведь",
+    year: 2009,
+    rating: 7.5,
+    genres: ["комедия", "семейный"],
+    country: "Россия",
+    description: "Девочка Маша — настоящий ураган! Она живёт рядом с домом доброго Медведя и постоянно втягивает его в свои шалости. Каждая серия — новое весёлое приключение.",
+    poster: "https://upload.wikimedia.org/wikipedia/ru/0/0e/Masha_and_the_Bear.jpg",
+    episodes: [
+      { title: "Серия 1. Первая встреча",  video: "video/masha-1.mp4" },
+      { title: "Серия 2. До весны",        video: "video/masha-2.mp4" },
+      { title: "Серия 3. Следы невиданных зверей", video: "video/masha-3.mp4" }
+    ]
+  },
+  {
+    id: 4,
+    type: "series",
+    title: "Смешарики",
+    year: 2003,
+    rating: 7.8,
+    genres: ["комедия", "семейный"],
+    country: "Россия",
+    description: "Круглые весёлые существа — Крош, Ёжик, Нюша, Копатыч, Совунья, Пин, Бараш и Кар-Карыч — живут в волшебной стране и учат детей добру.",
+    poster: "https://upload.wikimedia.org/wikipedia/ru/3/3f/Smeshariki.jpg",
+    episodes: [
+      { title: "Серия 1. Скамейка",   video: "video/smeshariki-1.mp4" },
+      { title: "Серия 2. Принцесса",  video: "video/smeshariki-2.mp4" }
+    ]
+  },
+
+  /* ---------- ФИЛЬМЫ ---------- */
+  {
+    id: 10,
+    type: "movie",
+    title: "История игрушек",
+    year: 1995,
+    rating: 8.3,
+    genres: ["комедия", "приключения", "семейный"],
+    country: "США",
+    duration: "81 мин",
+    description: "Игрушки мальчика Энди оживают, когда люди не видят их. Ковбой Вуди — любимая игрушка Энди, но в день рождения мальчика появляется новый герой — космический рейнджер Базз Лайтер.",
+    poster: "https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
+    video: "video/toy-story.mp4"
+  },
+  {
+    id: 11,
+    type: "movie",
+    title: "Король Лев",
+    year: 1994,
+    rating: 8.5,
+    genres: ["приключения", "семейный", "фэнтези"],
+    country: "США",
+    duration: "88 мин",
+    description: "Львёнок Симба — наследник короля саванны. После гибели отца он вынужден покинуть родные земли, но судьба приведёт его обратно, чтобы занять законное место на троне.",
+    poster: "https://image.tmdb.org/t/p/w500/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg",
+    video: ""
+  },
+  {
+    id: 12,
+    type: "movie",
+    title: "Шрек",
+    year: 2001,
+    rating: 8.1,
+    genres: ["комедия", "фэнтези", "семейный"],
+    country: "США",
+    duration: "90 мин",
+    description: "Огр Шрек живёт в одиночестве на болоте, пока туда не приходят сказочные существа, изгнанные злым лордом Фаркуадом. Чтобы вернуть тишину, Шрек отправляется спасать принцессу Фиону.",
+    poster: "https://image.tmdb.org/t/p/w500/iB64vpL3dIObOtMZgX3RqdVdQDc.jpg",
+    video: ""
+  },
+  {
+    id: 13,
+    type: "movie",
+    title: "В поисках Немо",
+    year: 2003,
+    rating: 8.2,
+    genres: ["приключения", "комедия", "семейный"],
+    country: "США",
+    duration: "100 мин",
+    description: "Рыбка-клоун Марлин отправляется в опасное путешествие через весь океан, чтобы найти своего сына Немо, которого поймали дайверы.",
+    poster: "https://image.tmdb.org/t/p/w500/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg",
+    video: ""
+  }
+];
+
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
+const app = document.getElementById('app');
+const searchInput = document.getElementById('search');
+
+let currentGenre = 'all';
+let currentSearch = '';
+let currentPage = 'home';
+let currentMovieId = null;
+let currentEpisodeIndex = 0;
+
+/* ============================================================
+   ГЛАВНАЯ СТРАНИЦА
+   ============================================================ */
+function renderHome() {
+  currentPage = 'home';
+  document.title = 'МультПланета — смотри мультфильмы онлайн';
+
+  const series = cartoons.filter(c => c.type === 'series');
+  const movies = cartoons.filter(c => c.type === 'movie');
+
+  app.innerHTML = `
+    <section class="hero">
+      <h1>Смотри любимые мультфильмы онлайн</h1>
+      <p>Сериалы и полнометражные мультфильмы для всей семьи</p>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">📺 Сериалы</h2>
+      <div class="catalog" id="seriesGrid"></div>
+    </section>
+
+    <section class="section">
+      <h2 class="section__title">🎬 Мультфильмы</h2>
+      <div class="catalog" id="moviesGrid"></div>
+    </section>
+  `;
+
+  fillGrid('seriesGrid', series);
+  fillGrid('moviesGrid', movies);
+}
+
+function fillGrid(gridId, list) {
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+
+  const filtered = list.filter(c => {
+    const matchSearch = c.title.toLowerCase().includes(currentSearch.toLowerCase());
+    return matchSearch;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty">😢 Ничего не найдено</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(c => `
+    <a class="card" onclick="openMovie(${c.id})">
+      <img class="card__poster" src="${c.poster}" alt="${c.title}" loading="lazy"
+        onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22450%22><rect fill=%22%232a2f4a%22 width=%22300%22 height=%22450%22/><text x=%22150%22 y=%22225%22 fill=%22%236b6f88%22 font-size=%2220%22 text-anchor=%22middle%22>Нет постера</text></svg>'">
+      <div class="card__body">
+        <div class="card__title">${c.title}</div>
+        <div class="card__meta">
+          <span>${c.year}</span>
+          <span class="card__rating">★ ${c.rating}</span>
+        </div>
+      </div>
+    </a>
+  `).join('');
+}
+
+/* ============================================================
+   СТРАНИЦА СЕРИАЛА / ФИЛЬМА
+   ============================================================ */
+function openMovie(id, episodeIndex = 0) {
+  currentPage = 'movie';
+  currentMovieId = id;
+  currentEpisodeIndex = episodeIndex;
+
+  const item = cartoons.find(c => c.id === id);
+  if (!item) return renderHome();
+
+  document.title = item.title + ' — МультПланета';
+  window.scrollTo(0, 0);
+
+  /* Определяем, какое видео проигрывать */
+  let videoSrc = '';
+  let currentTitle = item.title;
+
+  if (item.type === 'series' && item.episodes && item.episodes.length > 0) {
+    const ep = item.episodes[episodeIndex];
+    videoSrc = ep.video;
+    currentTitle = `${item.title} — ${ep.title}`;
+  } else {
+    videoSrc = item.video;
+  }
+
+  /* Плеер */
+  let playerHTML;
+  if (videoSrc) {
+    playerHTML = `
+      <video controls preload="metadata" poster="${item.poster}">
+        <source src="${videoSrc}" type="video/mp4">
+        Ваш браузер не поддерживает видео.
+      </video>`;
+  } else {
+    playerHTML = `
+      <div class="player-placeholder">
+        <p style="font-size:48px">🎬</p>
+        <p>Видео пока не добавлено</p>
+        <p style="font-size:13px;margin-top:8px">Положи файл в папку <b>video/</b> и укажи путь в данных</p>
+      </div>`;
+  }
+
+  /* Список серий (если сериал) */
+  let episodesHTML = '';
+  if (item.type === 'series' && item.episodes) {
+    episodesHTML = `
+      <div class="episodes">
+        <h2 class="episodes__title">Серии (${item.episodes.length})</h2>
+        <div class="episodes__list">
+          ${item.episodes.map((ep, i) => `
+            <div class="episode ${i === episodeIndex ? 'active' : ''}" onclick="openMovie(${item.id}, ${i})">
+              <div class="episode__num">${i + 1}</div>
+              <div class="episode__title">${ep.title}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  app.innerHTML = `
+    <div class="movie-page">
+      <button class="back-btn" onclick="goHome()">← Назад к каталогу</button>
+
+      <div class="player">${playerHTML}</div>
+
+      <div class="movie-header">
+        <img class="movie-poster" src="${item.poster}" alt="${item.title}"
+          onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22450%22><rect fill=%22%232a2f4a%22 width=%22300%22 height=%22450%22/><text x=%22150%22 y=%22225%22 fill=%22%236b6f88%22 font-size=%2220%22 text-anchor=%22middle%22>Нет постера</text></svg>'">
+        <div class="movie-info">
+          <h1>${currentTitle}</h1>
+          <div class="movie-meta">
+            <span>📅 ${item.year}</span>
+            ${item.duration ? `<span>⏱ ${item.duration}</span>` : ''}
+            <span>🌍 ${item.country}</span>
+            <span class="movie-rating">★ ${item.rating}</span>
+          </div>
+          <div class="genres">
+            ${item.genres.map(g => `<span class="genre-tag">${g}</span>`).join('')}
+          </div>
+          <p class="movie-desc">${item.description}</p>
+        </div>
+      </div>
+
+      ${episodesHTML}
+    </div>
+  `;
+}
+
+/* ============================================================
+   НАВИГАЦИЯ
+   ============================================================ */
+function goHome() {
+  currentSearch = '';
+  if (searchInput) searchInput.value = '';
+  renderHome();
+}
+
+/* ============================================================
+   ПОИСК
+   ============================================================ */
+searchInput.addEventListener('input', (e) => {
+  currentSearch = e.target.value;
+  if (currentPage !== 'home') {
+    renderHome();
+  } else {
+    renderHome();
+  }
+});
+
+/* ============================================================
+   СТАРТ
+   ============================================================ */
+renderHome();
+</script>
+
+</body>
+</html>
